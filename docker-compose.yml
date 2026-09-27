@@ -1,0 +1,82 @@
+services:
+
+  # ── MySQL 8 ──────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.4
+    container_name: erp_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: campus_erp
+      MYSQL_USER: erp_user
+      MYSQL_PASSWORD: erp_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-scripts:/docker-entrypoint-initdb.d   # optional: run custom init SQL
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-time-zone=+00:00
+      --innodb-buffer-pool-size=256M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "erp_user", "-perp_pass"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - erp_network
+
+  # ── Redis ─────────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7.4-alpine
+    container_name: erp_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --save 60 1 --loglevel warning
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - erp_network
+
+  # ── Spring Boot Backend (optional – comment out to run locally with ./mvnw) ──
+  # backend:
+  #   build:
+  #     context: ./erp-backend
+  #     dockerfile: Dockerfile
+  #   container_name: erp_backend
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     DB_HOST: mysql
+  #     DB_PORT: 3306
+  #     DB_NAME: campus_erp
+  #     DB_USERNAME: erp_user
+  #     DB_PASSWORD: erp_pass
+  #     REDIS_HOST: redis
+  #     REDIS_PORT: 6379
+  #     JWT_SECRET: change-this-to-a-very-long-secure-secret-key-256-bits
+  #   depends_on:
+  #     mysql:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #   networks:
+  #     - erp_network
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  erp_network:
+    driver: bridge
