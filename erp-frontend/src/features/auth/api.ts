@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import api from '@/api/client'
-import { LoginFormData, LoginResponse } from './types'
+import type { LoginFormData, LoginResponse } from './types'
 import { useAuthStore } from '@/store/authStore'
 import { useNavigate } from 'react-router-dom'
 

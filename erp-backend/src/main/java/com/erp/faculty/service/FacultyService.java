@@ -45,6 +45,10 @@ public class FacultyService {
         Role facultyRole = roleRepository.findByName("FACULTY")
                 .orElseThrow(() -> new RuntimeException("FACULTY role not found"));
 
+        String instType = request.getInstitutionType() != null && !request.getInstitutionType().isBlank()
+                ? request.getInstitutionType()
+                : (department.getInstitutionType() != null ? department.getInstitutionType() : "COLLEGE");
+
         // Create base user
         User user = User.builder()
                 .username(request.getEmployeeId()) // employee ID as username
@@ -53,6 +57,7 @@ public class FacultyService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .phone(request.getPhone())
+                .institutionType(instType)
                 .roles(Collections.singleton(facultyRole))
                 .build();
         
@@ -76,6 +81,7 @@ public class FacultyService {
                 .joiningDate(request.getJoiningDate())
                 .employmentType(request.getEmploymentType() != null ? request.getEmploymentType() : "FULL_TIME")
                 .salary(request.getSalary())
+                .institutionType(instType)
                 .build();
 
         return mapToDto(facultyRepository.save(faculty));
@@ -83,6 +89,14 @@ public class FacultyService {
 
     @Transactional(readOnly = true)
     public Page<FacultyDto> getAllFaculty(Pageable pageable) {
+        return facultyRepository.findAll(pageable).map(this::mapToDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FacultyDto> getAllFaculty(String institutionType, String search, Pageable pageable) {
+        if (institutionType != null || search != null) {
+            return facultyRepository.searchFaculty(institutionType, search, pageable).map(this::mapToDto);
+        }
         return facultyRepository.findAll(pageable).map(this::mapToDto);
     }
 
@@ -148,6 +162,7 @@ public class FacultyService {
                 .employmentType(faculty.getEmploymentType())
                 .salary(faculty.getSalary())
                 .status(faculty.getStatus())
+                .institutionType(faculty.getInstitutionType() != null ? faculty.getInstitutionType() : "COLLEGE")
                 .build();
     }
 }

@@ -38,4 +38,5 @@ public class CreateStudentRequest {
     private LocalDate dateOfBirth;
     private String gender;
     private String password; // Raw password to be hashed
+    private String institutionType;
 }

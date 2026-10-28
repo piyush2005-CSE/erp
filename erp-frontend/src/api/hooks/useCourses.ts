@@ -5,8 +5,10 @@ export const useCourses = (search?: string) => {
   return useQuery({
     queryKey: ['courses', search],
     queryFn: async () => {
-      const res = await api.get('/courses', { params: { search } })
-      return res.data.data
+      const res = await api.get('/courses', { params: { search, size: 200 } })
+      // API returns Page<CourseDto>; extract the content array
+      const data = res.data.data
+      return Array.isArray(data) ? data : (data?.content ?? [])
     },
   })
 }
@@ -26,7 +28,9 @@ export const useSemesters = () => {
     queryKey: ['semesters'],
     queryFn: async () => {
       const res = await api.get('/semesters')
-      return res.data.data
+      // API returns List<SemesterDto> (not paginated)
+      const data = res.data.data
+      return Array.isArray(data) ? data : (data?.content ?? [])
     },
   })
 }

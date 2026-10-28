@@ -41,6 +41,13 @@ public class AuthService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Only validate institution type if the user has one assigned
+        String userInstType = user.getInstitutionType();
+        if (userInstType != null && !userInstType.isBlank() &&
+                !userInstType.equalsIgnoreCase(request.getInstitutionType())) {
+            throw new RuntimeException("This account is not registered for " + request.getInstitutionType() + " login");
+        }
+
         return generateAuthResponse(user);
     }
 
@@ -97,6 +104,7 @@ public class AuthService {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .avatarUrl(user.getAvatarUrl())
+                .institutionType(user.getInstitutionType())
                 .roles(roleNames)
                 .permissions(permissionNames)
                 .build();

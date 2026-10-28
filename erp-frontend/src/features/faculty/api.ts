@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import api from '@/api/client'
-import { Faculty, CreateFacultyFormData } from './types'
-import { PaginatedResponse } from '../students/types' // Reusing from students for now
+import type { Faculty, CreateFacultyFormData } from './types'
+import type { PaginatedResponse } from '../students/types' // Reusing from students for now
 
 interface ApiResponse<T> {
   success: boolean

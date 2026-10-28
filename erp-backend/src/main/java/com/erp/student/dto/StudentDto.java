@@ -30,4 +30,5 @@ public class StudentDto {
     private Integer batchYear;
     private LocalDate admissionDate;
     private String status;
+    private String institutionType;
 }

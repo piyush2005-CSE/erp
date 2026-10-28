@@ -6,9 +6,11 @@ export const useAttendanceSessions = (courseId?: number, semesterId?: number) =>
     queryKey: ['attendance-sessions', courseId, semesterId],
     queryFn: async () => {
       const res = await api.get('/attendance/sessions', {
-        params: { courseId, semesterId },
+        params: { courseId, semesterId, size: 500 },
       })
-      return res.data.data
+      // API returns Page<AttendanceSessionDto>; extract content array
+      const data = res.data.data
+      return Array.isArray(data) ? data : (data?.content ?? [])
     },
     enabled: !!courseId && !!semesterId,
   })

@@ -28,4 +28,5 @@ public class FacultyDto {
     private String employmentType;
     private BigDecimal salary;
     private String status;
+    private String institutionType;
 }

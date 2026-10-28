@@ -1,19 +1,28 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { loginSchema, LoginFormData } from '@/features/auth/types'
+import { loginSchema } from '@/features/auth/types'
+import type { LoginFormData } from '@/features/auth/types'
 import { useLogin } from '@/features/auth/api'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 export default function LoginPage() {
+  const [institutionType, setInstitutionType] = useState<'SCHOOL' | 'COLLEGE'>('COLLEGE')
+
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      institutionType: 'COLLEGE'
+    }
   })
 
   const loginMutation = useLogin()
 
   const onSubmit = (data: LoginFormData) => {
+    // Override form data with selected tab just in case
+    data.institutionType = institutionType
     loginMutation.mutate(data)
   }
 
@@ -25,7 +34,35 @@ export default function LoginPage() {
           <p className="text-sm text-muted-foreground mt-2">Sign in to your account</p>
         </div>
 
+        {/* Custom Toggle for Institution Type */}
+        <div className="flex p-1 bg-muted rounded-lg">
+          <button
+            type="button"
+            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
+              institutionType === 'SCHOOL'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+            onClick={() => setInstitutionType('SCHOOL')}
+          >
+            School
+          </button>
+          <button
+            type="button"
+            className={`flex-1 py-2 text-sm font-medium rounded-md transition-all ${
+              institutionType === 'COLLEGE'
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+            onClick={() => setInstitutionType('COLLEGE')}
+          >
+            College
+          </button>
+        </div>
+
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <input type="hidden" {...register('institutionType')} value={institutionType} />
+          
           <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
             <Input
@@ -62,7 +99,7 @@ export default function LoginPage() {
             className="w-full bg-brand-600 hover:bg-brand-700" 
             disabled={loginMutation.isPending}
           >
-            {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
+            {loginMutation.isPending ? 'Signing in...' : `Sign in to ${institutionType === 'SCHOOL' ? 'School' : 'College'}`}
           </Button>
 
           {loginMutation.isError && (

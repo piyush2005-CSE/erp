@@ -29,8 +29,11 @@ public class StudentController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('STUDENT_READ')")
-    public ResponseEntity<ApiResponse<Page<StudentDto>>> getAllStudents(Pageable pageable) {
-        Page<StudentDto> students = studentService.getAllStudents(pageable);
+    public ResponseEntity<ApiResponse<Page<StudentDto>>> getAllStudents(
+            @RequestParam(required = false) String institutionType,
+            @RequestParam(required = false) String search,
+            Pageable pageable) {
+        Page<StudentDto> students = studentService.getAllStudents(institutionType, search, pageable);
         return ResponseEntity.ok(ApiResponse.success(students));
     }
 

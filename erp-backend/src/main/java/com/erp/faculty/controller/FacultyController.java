@@ -28,8 +28,11 @@ public class FacultyController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('FACULTY_READ')")
-    public ResponseEntity<ApiResponse<Page<FacultyDto>>> getAllFaculty(Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.success(facultyService.getAllFaculty(pageable)));
+    public ResponseEntity<ApiResponse<Page<FacultyDto>>> getAllFaculty(
+            @RequestParam(required = false) String institutionType,
+            @RequestParam(required = false) String search,
+            Pageable pageable) {
+        return ResponseEntity.ok(ApiResponse.success(facultyService.getAllFaculty(institutionType, search, pageable)));
     }
 
     @GetMapping("/{id}")

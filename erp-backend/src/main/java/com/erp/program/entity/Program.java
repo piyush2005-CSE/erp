@@ -49,6 +49,10 @@ public class Program {
     @Builder.Default
     private boolean isActive = true;
 
+    @Column(name = "institution_type", length = 20)
+    @Builder.Default
+    private String institutionType = "COLLEGE";
+
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

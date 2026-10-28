@@ -51,6 +51,10 @@ public class StudentService {
         Role studentRole = roleRepository.findByName("STUDENT")
                 .orElseThrow(() -> new RuntimeException("STUDENT role not found"));
 
+        String instType = request.getInstitutionType() != null && !request.getInstitutionType().isBlank()
+                ? request.getInstitutionType()
+                : (department.getInstitutionType() != null ? department.getInstitutionType() : "COLLEGE");
+
         // Create base user
         User user = User.builder()
                 .username(request.getRollNumber()) // typically roll number is username for students
@@ -59,6 +63,7 @@ public class StudentService {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .phone(request.getPhone())
+                .institutionType(instType)
                 .roles(Collections.singleton(studentRole))
                 .build();
         
@@ -78,6 +83,7 @@ public class StudentService {
                 .program(program)
                 .batchYear(request.getBatchYear())
                 .admissionDate(request.getAdmissionDate())
+                .institutionType(instType)
                 .build();
 
         student = studentRepository.save(student);
@@ -86,6 +92,14 @@ public class StudentService {
 
     @Transactional(readOnly = true)
     public Page<StudentDto> getAllStudents(Pageable pageable) {
+        return studentRepository.findAll(pageable).map(this::mapToDto);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<StudentDto> getAllStudents(String institutionType, String search, Pageable pageable) {
+        if (institutionType != null || search != null) {
+            return studentRepository.searchStudents(institutionType, search, pageable).map(this::mapToDto);
+        }
         return studentRepository.findAll(pageable).map(this::mapToDto);
     }
 
@@ -151,6 +165,7 @@ public class StudentService {
                 .batchYear(student.getBatchYear())
                 .admissionDate(student.getAdmissionDate())
                 .status(student.getStatus())
+                .institutionType(student.getInstitutionType() != null ? student.getInstitutionType() : "COLLEGE")
                 .build();
     }
 }

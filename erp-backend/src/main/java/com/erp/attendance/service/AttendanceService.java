@@ -94,8 +94,6 @@ public class AttendanceService {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
-        long total = sessionRepository.countByCourseIdAndSemesterId(courseId, null);
-        // Use record count as actual total
         List<AttendanceRecord> records = recordRepository.findByStudentAndCourse(studentId, courseId);
         long present = records.stream().filter(r -> "PRESENT".equals(r.getStatus())).count();
         long absent = records.stream().filter(r -> "ABSENT".equals(r.getStatus())).count();

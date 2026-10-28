@@ -93,6 +93,10 @@ public class Faculty {
     @Builder.Default
     private String status = "ACTIVE";
 
+    @Column(name = "institution_type", length = 20)
+    @Builder.Default
+    private String institutionType = "COLLEGE";
+
     @Column(name = "address_line1", length = 255)
     private String addressLine1;
 

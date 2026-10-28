@@ -124,6 +124,10 @@ public class Student {
     @Builder.Default
     private String status = "ACTIVE";
 
+    @Column(name = "institution_type", length = 20)
+    @Builder.Default
+    private String institutionType = "COLLEGE";
+
     // --- Guardian Info ---
 
     @Column(name = "guardian_name", length = 150)

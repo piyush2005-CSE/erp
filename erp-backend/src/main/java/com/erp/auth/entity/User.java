@@ -57,6 +57,10 @@ public class User implements UserDetails {
     @Builder.Default
     private boolean isLocked = false;
 
+    @Column(name = "institution_type", length = 20)
+    @Builder.Default
+    private String institutionType = "COLLEGE";
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

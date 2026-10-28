@@ -10,6 +10,7 @@ export interface AuthUser {
   roles: string[]
   permissions: string[]
   avatarUrl?: string
+  institutionType: string
 }
 
 interface AuthState {
@@ -17,10 +18,12 @@ interface AuthState {
   accessToken: string | null
   refreshToken: string | null
   isAuthenticated: boolean
+  institutionType: 'SCHOOL' | 'COLLEGE' | null
 
   // Actions
   setAuth: (user: AuthUser, accessToken: string, refreshToken: string) => void
   setTokens: (accessToken: string, refreshToken: string) => void
+  setInstitutionType: (type: 'SCHOOL' | 'COLLEGE') => void
   logout: () => void
 
   // Permission helpers
@@ -36,15 +39,22 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       refreshToken: null,
       isAuthenticated: false,
+      institutionType: null,
 
       setAuth: (user, accessToken, refreshToken) =>
-        set({ user, accessToken, refreshToken, isAuthenticated: true }),
+        set({ user, accessToken, refreshToken, isAuthenticated: true, institutionType: (user.institutionType as 'SCHOOL' | 'COLLEGE') || 'COLLEGE' }),
 
       setTokens: (accessToken, refreshToken) =>
         set({ accessToken, refreshToken }),
 
+      setInstitutionType: (institutionType) =>
+        set((state) => ({
+          institutionType,
+          user: state.user ? { ...state.user, institutionType } : null,
+        })),
+
       logout: () =>
-        set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false }),
+        set({ user: null, accessToken: null, refreshToken: null, isAuthenticated: false, institutionType: null }),
 
       hasRole: (role) => get().user?.roles.includes(role) ?? false,
 
@@ -62,6 +72,7 @@ export const useAuthStore = create<AuthState>()(
         accessToken: state.accessToken,
         refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
+        institutionType: state.institutionType,
       }),
     }
   )
